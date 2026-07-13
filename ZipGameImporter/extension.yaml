@@ -1,0 +1,9 @@
+Id: 7f3e3e6d-4f5a-4f1b-a8d5-8c8c4a2e1abc
+Name: ZIP Game Importer
+Author: Imants Gulbis
+Version: 1.0
+Module: ZipGameImporter.dll
+Type: GenericPlugin
+Icon: icon.png
+Description: Imports games from ZIP archives, extracts them, finds executables, and updates Playnite entries.
+RequiredApiVersion: 6.11.0

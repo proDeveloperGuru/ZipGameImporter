@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZipGameImporter", "ZipGameImporter\ZipGameImporter.csproj", "{244A9648-B6BA-4068-9323-EED234875537}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{244A9648-B6BA-4068-9323-EED234875537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{244A9648-B6BA-4068-9323-EED234875537}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{244A9648-B6BA-4068-9323-EED234875537}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{244A9648-B6BA-4068-9323-EED234875537}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
