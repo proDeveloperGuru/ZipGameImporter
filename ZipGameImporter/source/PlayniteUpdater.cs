@@ -3,16 +3,21 @@ using Playnite.SDK.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime;
 
 namespace ZipGameImporter
 {
     internal class PlayniteUpdater
     {
         private readonly IPlayniteAPI api;
+        private readonly PluginSettings settings;
+        private readonly Logger logger;
 
-        public PlayniteUpdater(IPlayniteAPI playniteApi)
+        public PlayniteUpdater(IPlayniteAPI playniteApi, PluginSettings settings, Logger logger)
         {
             api = playniteApi;
+            this.settings = settings;
+            this.logger = logger;
         }
 
         public Game FindGame(string gameName)
@@ -20,9 +25,20 @@ namespace ZipGameImporter
             return api.Database.Games
                 .FirstOrDefault(g =>
                     string.Equals(
-                        g.Name,
-                        gameName,
+                        g.Name.NoSpace(),
+                        gameName.NoSpace(),
                         StringComparison.OrdinalIgnoreCase));
+        }
+
+        private void UpdateCategories(Game game)
+        {
+            foreach (var category in settings.Categories)
+            {
+                if (!game.Categories.Any(x => x.Id == category.Id))
+                {
+                    game.Categories.Add(category);
+                }
+            }
         }
 
         public bool UpdateGame(
@@ -36,13 +52,16 @@ namespace ZipGameImporter
                 Game game = FindGame(gameName);
 
                 if (game == null)
-                    return false;
+                    throw new Exception("Game not found: " + gameName);
 
                 game.Version = version;
-                game.Hidden = true;
                 game.IsInstalled = true;
                 game.InstallDirectory = installDirectory;
 
+                game.Hidden = settings.Hidden;
+                game.SourceId = settings.Source.Id;
+
+                UpdateCategories(game);
                 UpdatePlayAction(game, executable);
 
                 api.Database.Games.Update(game);
@@ -51,6 +70,8 @@ namespace ZipGameImporter
             }
             catch (Exception ex)
             {
+                logger.Error("Failed to update game: " + ex.Message);
+
                 return false;
             }
         }
@@ -66,14 +87,17 @@ namespace ZipGameImporter
                 Game game = FindGame(gameName);
 
                 if (game != null)
-                    return false;
+                    throw new Exception("Game is already created: " + gameName);
 
                 game = new Game(gameName);
 
                 game.Version = version;
-                game.Hidden = true;
                 game.IsInstalled = true;
                 game.InstallDirectory = installDirectory;
+
+                game.Hidden = settings.Hidden;
+                game.SourceId = settings.Source.Id;
+                game.Categories.AddRange(settings.Categories);
 
                 UpdatePlayAction(game, executable);
 
@@ -83,6 +107,8 @@ namespace ZipGameImporter
             }
             catch (Exception ex)
             {
+                logger.Error("Failed to add game: " + ex.Message);
+
                 return false;
             }
         }

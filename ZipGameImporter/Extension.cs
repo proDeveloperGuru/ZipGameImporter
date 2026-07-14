@@ -2,9 +2,9 @@
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
-using System.Windows.Controls;
-using System.Windows;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 
 
 namespace ZipGameImporter
@@ -24,15 +24,14 @@ namespace ZipGameImporter
             : base(api)
         {
             Settings = LoadPluginSettings<PluginSettings>();
+
             if (Settings == null)
             {
                 Settings = new PluginSettings();
             }
 
             settingsViewModel =
-                new PluginSettingsViewModel(
-                    this,
-                    Settings);
+                new PluginSettingsViewModel(this, Settings);
 
             Properties = new GenericPluginProperties
             {
@@ -53,6 +52,7 @@ namespace ZipGameImporter
 
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
+            settingsViewModel.RefreshLists();
             return new SettingsView();
         }
 
@@ -63,13 +63,16 @@ namespace ZipGameImporter
 
         private void ImportGames(MainMenuItemActionArgs args)
         {
+            Settings = LoadPluginSettings<PluginSettings>();
+
             Task.Run(() =>
             {
                 try
                 {
+                    var logger = new Logger();
                     var updater =
                         new PlayniteUpdater(
-                            PlayniteApi);
+                            PlayniteApi,Settings, logger);
 
 
                     var importer =
@@ -78,7 +81,7 @@ namespace ZipGameImporter
                             action =>
                             {
                                 Application.Current.Dispatcher.Invoke(action);
-                            });
+                            },logger);
 
 
                     importer.ImportFolder(

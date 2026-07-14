@@ -1,9 +1,6 @@
 ﻿using Playnite.SDK.Models;
 using System;
 using System.IO;
-using System.IO.Compression;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ZipGameImporter
 {
@@ -16,9 +13,9 @@ namespace ZipGameImporter
         private readonly Logger logger;
         private readonly Action<Action> runOnMainThread;
 
-        public Importer(PlayniteUpdater updater, Action<Action> runOnMainThread)
+        public Importer(PlayniteUpdater updater, Action<Action> runOnMainThread, Logger logger)
         {
-            logger = new Logger();
+            this.logger = logger;
             versionParser = new VersionParser(logger);
             executableFinder = new ExecutableFinder();
             zipExtractor = new ZipExtractor(logger);

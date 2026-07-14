@@ -45,6 +45,7 @@ namespace ZipGameImporter
             }
         }
 
+        // ToDo: Must find a way to get rid top level folder on extraction, since we already create a folder for each game
         public bool ExtractSafely(string zipFile, string destinationFolder)
         {
             string tempFolder = destinationFolder + "_temp";

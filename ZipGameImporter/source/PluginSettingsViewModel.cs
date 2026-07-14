@@ -1,7 +1,9 @@
 ﻿using Playnite.SDK;
+using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 
 namespace ZipGameImporter
@@ -11,6 +13,7 @@ namespace ZipGameImporter
         private readonly Extension plugin;
 
         private PluginSettings settings;
+        private List<GameSource> sources;
 
 
         public PluginSettings Settings
@@ -23,6 +26,16 @@ namespace ZipGameImporter
             }
         }
 
+        public List<GameSource> Sources
+        {
+            get => sources;
+            set
+            {
+                sources = value;
+                OnPropertyChanged();
+            }
+        }
+        public List<CategorySelection> Categories { get; set; }
 
         public ICommand BrowseIncomingCommand { get; }
 
@@ -30,13 +43,17 @@ namespace ZipGameImporter
 
 
         public PluginSettingsViewModel(
-            Extension plugin,
-            PluginSettings settings)
+            Extension plugin, PluginSettings settings)
         {
             this.plugin = plugin;
 
             Settings = settings;
-
+            //Sources = plugin.PlayniteApi.Database.Sources.ToList();
+            //Categories = plugin.PlayniteApi.Database.Categories.Select(x => new CategorySelection
+            //{
+            //    Category = x,
+            //    IsSelected = Settings.Categories.Any(c => c.Id == x.Id)
+            //}).ToList();
 
             BrowseIncomingCommand =
                 new RelayCommand(
@@ -141,6 +158,16 @@ namespace ZipGameImporter
 
 
             return errors.Count == 0;
+        }
+
+        public void RefreshLists()
+        {
+            Sources = plugin.PlayniteApi.Database.Sources.ToList();
+            Categories = plugin.PlayniteApi.Database.Categories.Select(x => new CategorySelection
+            {
+                Category = x,
+                IsSelected = Settings.Categories.Any(c => c.Id == x.Id)
+            }).ToList();
         }
     }
 }

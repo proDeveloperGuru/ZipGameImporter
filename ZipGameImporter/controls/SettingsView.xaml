@@ -9,31 +9,114 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="180"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="90"/>
         </Grid.ColumnDefinitions>
-        
-        <TextBlock Text="ZIP source folder" Grid.Row="0" Grid.Column="0" Margin="5"/>
-
-        <TextBox Text="{Binding Settings.IncomingFolder}" Grid.Row="0" Grid.Column="1" Margin="5"/>
-
-        <Button Content="Browse" Grid.Row="0" Grid.Column="2"
-                    Command="{Binding BrowseIncomingCommand}"
-                    Margin="5"/>
 
 
-        <TextBlock Text="Games installation folder" Grid.Row="1" Grid.Column="0"
+        <!-- ZIP folder -->
+        <TextBlock Text="ZIP source folder"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   VerticalAlignment="Center"
                    Margin="5"/>
 
-        <TextBox Text="{Binding Settings.GamesFolder}" Grid.Row="1" Grid.Column="1" Margin="5"/>
+        <TextBox Text="{Binding Settings.IncomingFolder, Mode=TwoWay}"
+                 Grid.Row="0"
+                 Grid.Column="1"
+                 Margin="5"
+                 VerticalAlignment="Center"/>
 
-        <Button Content="Browse" Grid.Row="1" Grid.Column="2"
-                    Command="{Binding BrowseGamesCommand}"
-                    Margin="5"/>
+        <Button Content="Browse"
+                Grid.Row="0"
+                Grid.Column="2"
+                Margin="5"
+                Command="{Binding BrowseIncomingCommand}"/>
+
+
+        <!-- Games folder -->
+        <TextBlock Text="Games installation folder"
+                   Grid.Row="1"
+                   Grid.Column="0"
+                   VerticalAlignment="Center"
+                   Margin="5"/>
+
+        <TextBox Text="{Binding Settings.GamesFolder, Mode=TwoWay}"
+                 Grid.Row="1"
+                 Grid.Column="1"
+                 Margin="5"
+                 VerticalAlignment="Center"/>
+
+        <Button Content="Browse"
+                Grid.Row="1"
+                Grid.Column="2"
+                Margin="5"
+                Command="{Binding BrowseGamesCommand}"/>
+
+
+        <!-- Source -->
+        <TextBlock Text="Source"
+                   Grid.Row="2"
+                   Grid.Column="0"
+                   VerticalAlignment="Center"
+                   Margin="5"/>
+
+        <ComboBox ItemsSource="{Binding Sources}"
+                  SelectedItem="{Binding Settings.Source, Mode=TwoWay}"
+                  DisplayMemberPath="Name"
+                  Grid.Row="2"
+                  Grid.Column="1"
+                  Margin="5"/>
+
+
+        <!-- Categories -->
+        <TextBlock Text="Categories"
+                   Grid.Row="3"
+                   Grid.Column="0"
+                   VerticalAlignment="Top"
+                   Margin="5"/>
+
+        <ComboBox x:Name="CategoriesComboBox"
+          ItemsSource="{Binding Categories}"
+          Grid.Row="3"
+          Grid.Column="1"
+          Margin="5"
+                  PreviewMouseDown="CategoriesComboBox_PreviewMouseDown"
+          IsEditable="True"
+          IsReadOnly="True"
+          StaysOpenOnEdit="True">
+
+            <ComboBox.Resources>
+                <Style TargetType="ComboBoxItem">
+                    <Setter Property="Focusable" Value="False"/>
+                </Style>
+            </ComboBox.Resources>
+
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Content="{Binding Name}"
+                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                      Checked="CategoryCheckedChanged"
+                      Unchecked="CategoryCheckedChanged"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+
+        </ComboBox>
+
+
+        <!-- Hidden -->
+        <CheckBox Content="Hidden"
+                  IsChecked="{Binding Settings.Hidden, Mode=TwoWay}"
+                  Grid.Row="4"
+                  Grid.Column="1"
+                  Margin="5"/>
 
     </Grid>
 </UserControl>
