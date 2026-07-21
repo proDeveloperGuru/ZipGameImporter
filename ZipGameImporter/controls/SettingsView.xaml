@@ -28,7 +28,7 @@
                    VerticalAlignment="Center"
                    Margin="5"/>
 
-        <TextBox Text="{Binding Settings.IncomingFolder, Mode=TwoWay}"
+        <TextBox Text="{Binding IncomingFolder}"
                  Grid.Row="0"
                  Grid.Column="1"
                  Margin="5"
@@ -48,7 +48,7 @@
                    VerticalAlignment="Center"
                    Margin="5"/>
 
-        <TextBox Text="{Binding Settings.GamesFolder, Mode=TwoWay}"
+        <TextBox Text="{Binding GamesFolder }"
                  Grid.Row="1"
                  Grid.Column="1"
                  Margin="5"
@@ -69,7 +69,8 @@
                    Margin="5"/>
 
         <ComboBox ItemsSource="{Binding Sources}"
-                  SelectedItem="{Binding Settings.Source, Mode=TwoWay}"
+                  SelectedValue="{Binding SourceId, Mode=TwoWay}"
+                  SelectedValuePath="Id"
                   DisplayMemberPath="Name"
                   Grid.Row="2"
                   Grid.Column="1"
@@ -88,14 +89,23 @@
           Grid.Row="3"
           Grid.Column="1"
           Margin="5"
-                  PreviewMouseDown="CategoriesComboBox_PreviewMouseDown"
+          Text="{Binding SelectedCategoriesText, Mode=OneWay}"
           IsEditable="True"
           IsReadOnly="True"
           StaysOpenOnEdit="True">
 
             <ComboBox.Resources>
+                <Style TargetType="TextBox">
+                    <Setter Property="IsHitTestVisible" Value="False"/>
+                </Style>
+
                 <Style TargetType="ComboBoxItem">
                     <Setter Property="Focusable" Value="False"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="BorderThickness" Value="0"/>
                 </Style>
             </ComboBox.Resources>
 
@@ -104,19 +114,27 @@
                     <CheckBox Content="{Binding Name}"
                       IsChecked="{Binding IsSelected, Mode=TwoWay}"
                       Checked="CategoryCheckedChanged"
-                      Unchecked="CategoryCheckedChanged"/>
+                      Unchecked="CategoryCheckedChanged"
+                      HorizontalAlignment="Stretch"
+                              Padding="6,4"
+                      VerticalAlignment="Stretch"/>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
 
         </ComboBox>
 
-
         <!-- Hidden -->
         <CheckBox Content="Hidden"
-                  IsChecked="{Binding Settings.Hidden, Mode=TwoWay}"
+                  IsChecked="{Binding Hidden, Mode=TwoWay}"
                   Grid.Row="4"
                   Grid.Column="1"
                   Margin="5"/>
+
+        <Button Content="Remove" Grid.Row="4" Grid.Column="2"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="5"
+            Command="{Binding RemoveCommand}" />
 
     </Grid>
 </UserControl>

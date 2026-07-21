@@ -107,5 +107,10 @@ namespace ZipGameImporter
         {
             return logFile;
         }
+
+        internal void Info(object v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

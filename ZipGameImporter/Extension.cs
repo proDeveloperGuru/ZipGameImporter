@@ -4,17 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-
+using ZipGameImporter.Controls;
+using ZipGameImporter.ViewModels;
 
 namespace ZipGameImporter
 {
     public class Extension : GenericPlugin
     {
-        private PluginSettings Settings;
-        private PluginSettingsViewModel settingsViewModel;
+        private ImportOption Settings;
         private const string MenuName = "Import ZIP Games";
-
+        private IPlayniteAPI api;
 
         public override Guid Id =>
             Guid.Parse("7f3e3e6d-4f5a-4f1b-a8d5-8c8c4a2e1abc");
@@ -23,19 +22,10 @@ namespace ZipGameImporter
         public Extension(IPlayniteAPI api)
             : base(api)
         {
-            Settings = LoadPluginSettings<PluginSettings>();
-
-            if (Settings == null)
-            {
-                Settings = new PluginSettings();
-            }
-
-            settingsViewModel =
-                new PluginSettingsViewModel(this, Settings);
-
+            this.api = api;
             Properties = new GenericPluginProperties
             {
-                HasSettings = true
+                HasSettings = false,
             };
         }
 
@@ -46,67 +36,29 @@ namespace ZipGameImporter
             {
                 Description = MenuName,
                 MenuSection = "Tools",
-                Action = ImportGames
+                Action = OpenImportDialog
             };
         }
 
-        public override UserControl GetSettingsView(bool firstRunSettings)
+        private void OpenImportDialog(MainMenuItemActionArgs args)
         {
-            settingsViewModel.RefreshLists();
-            return new SettingsView();
-        }
-
-        public override ISettings GetSettings(bool firstRunSettings)
-        {
-            return settingsViewModel;
-        }
-
-        private void ImportGames(MainMenuItemActionArgs args)
-        {
-            Settings = LoadPluginSettings<PluginSettings>();
-
-            Task.Run(() =>
+            var window = PlayniteApi.Dialogs.CreateWindow(new WindowCreationOptions
             {
-                try
-                {
-                    var logger = new Logger();
-                    var updater =
-                        new PlayniteUpdater(
-                            PlayniteApi,Settings, logger);
-
-
-                    var importer =
-                        new Importer(
-                            updater,
-                            action =>
-                            {
-                                Application.Current.Dispatcher.Invoke(action);
-                            },logger);
-
-
-                    importer.ImportFolder(
-                        Settings.IncomingFolder,
-                    Settings.GamesFolder);
-
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        PlayniteApi.Dialogs.ShowMessage(
-                            "ZIP import completed.",
-                            "ZIP Game Importer");
-                    });
-
-                }
-                catch (Exception ex)
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        PlayniteApi.Dialogs.ShowErrorMessage(
-                            ex.Message,
-                            "ZIP Game Importer");
-                    });
-                }
+                ShowMinimizeButton = false,
+                ShowMaximizeButton = false
             });
-            
+
+            var viewModel = new ImportDialogViewModel(this, api ,window.Close);
+
+            window.Title = "Import Games";
+            window.Content = new ImportDialog
+            {
+                DataContext = viewModel,
+            };
+
+            window.ShowDialog();
         }
+
+        
     }
 }

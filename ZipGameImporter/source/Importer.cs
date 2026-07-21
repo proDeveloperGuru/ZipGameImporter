@@ -1,6 +1,7 @@
 ﻿using Playnite.SDK.Models;
 using System;
 using System.IO;
+using ZipGameImporter.ViewModels;
 
 namespace ZipGameImporter
 {
@@ -57,7 +58,7 @@ namespace ZipGameImporter
 
         private void ProcessZip(
             string zipFile,
-            string gamesFolder)
+            ImportOption option)
         {
             try
             {
@@ -82,7 +83,7 @@ namespace ZipGameImporter
 
                 string installFolder =
                     Path.Combine(
-                        gamesFolder,
+                        option.GamesFolder,
                         parsed.Name);
 
                 runOnMainThread(() =>
@@ -91,7 +92,8 @@ namespace ZipGameImporter
                         parsed.Name,
                         parsed.VersionString,
                         installFolder,
-                        zipFile);
+                        zipFile,
+                        option);
                 });
             }
             catch (Exception ex) {
@@ -103,7 +105,8 @@ namespace ZipGameImporter
         private void UpdatePlaynite(string name,
             string version,
             string installFolder,
-            string zipFile)
+            string zipFile,
+            ImportOption option)
         {
             try
             {
@@ -121,7 +124,8 @@ namespace ZipGameImporter
                             name,
                             version,
                             installFolder,
-                            result.Item2);
+                            result.Item2,
+                            option);
 
                     if (added)
                         logger.Info(name + " (" + version + ") added");
@@ -148,7 +152,8 @@ namespace ZipGameImporter
                             name,
                             version,
                             installFolder,
-                            result.Item2);
+                            result.Item2, 
+                            option);
 
                     if (updated)
                         logger.Info("Playnite updated.");
@@ -184,10 +189,9 @@ namespace ZipGameImporter
         }
 
         public void ImportFolder(
-            string zipFolder,
-            string gamesFolder)
+            ImportOption option)
         {
-            if (!Directory.Exists(zipFolder))
+            if (!Directory.Exists(option.IncomingFolder))
             {
                 Console.WriteLine("ZIP folder not found.");
                 return;
@@ -196,14 +200,14 @@ namespace ZipGameImporter
 
             var zipFiles = Directory
                 .GetFiles(
-                    zipFolder,
+                    option.IncomingFolder,
                     "*.zip",
                     SearchOption.TopDirectoryOnly);
 
 
             foreach (string zip in zipFiles)
             {
-                ProcessZip(zip, gamesFolder);
+                ProcessZip(zip, option);
             }
         }
     }

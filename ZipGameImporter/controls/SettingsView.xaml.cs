@@ -1,7 +1,9 @@
 ﻿using Playnite.SDK.Models;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using ZipGameImporter.ViewModels;
 
 namespace ZipGameImporter
 {
@@ -19,28 +21,18 @@ namespace ZipGameImporter
             object sender,
             RoutedEventArgs e)
         {
-            PluginSettingsViewModel vm =
-                DataContext as PluginSettingsViewModel;
+            ImportOption vm =
+                DataContext as ImportOption;
 
             if (vm != null)
             {
-                vm.Settings.Categories =
+                vm.SelectedCategories = new ObservableCollection<Category>(
                     vm.Categories
                     .Where(x => x.IsSelected)
                     .Select(x => x.Category)
-                    .ToList();
+                    .ToList());
 
                 vm.OnPropertyChanged("SelectedCategoriesText");
-            }
-        }
-
-        private void CategoriesComboBox_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            ComboBox combo = sender as ComboBox;
-
-            if (combo != null)
-            {
-                combo.IsDropDownOpen = true;
             }
         }
     }

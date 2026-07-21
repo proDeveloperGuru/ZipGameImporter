@@ -1,22 +1,23 @@
-﻿using Playnite.SDK;
+﻿using Newtonsoft.Json;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime;
+using ZipGameImporter.ViewModels;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace ZipGameImporter
 {
     internal class PlayniteUpdater
     {
         private readonly IPlayniteAPI api;
-        private readonly PluginSettings settings;
         private readonly Logger logger;
 
-        public PlayniteUpdater(IPlayniteAPI playniteApi, PluginSettings settings, Logger logger)
+        public PlayniteUpdater(IPlayniteAPI playniteApi, Logger logger)
         {
             api = playniteApi;
-            this.settings = settings;
             this.logger = logger;
         }
 
@@ -30,9 +31,9 @@ namespace ZipGameImporter
                         StringComparison.OrdinalIgnoreCase));
         }
 
-        private void UpdateCategories(Game game)
+        private void UpdateCategories(Game game, ImportOption option)
         {
-            foreach (var category in settings.Categories)
+            foreach (var category in option.SelectedCategories)
             {
                 if (!game.Categories.Any(x => x.Id == category.Id))
                 {
@@ -41,11 +42,17 @@ namespace ZipGameImporter
             }
         }
 
+        public void DebugSource(Game game)
+        {
+            logger.Info(JsonConvert.SerializeObject(game));
+        }
+
         public bool UpdateGame(
             string gameName,
             string version,
             string installDirectory,
-            string executable)
+            string executable,
+            ImportOption option)
         {
             try
             {
@@ -58,11 +65,15 @@ namespace ZipGameImporter
                 game.IsInstalled = true;
                 game.InstallDirectory = installDirectory;
 
-                game.Hidden = settings.Hidden;
-                game.SourceId = settings.Source.Id;
+                game.Hidden = option.Hidden;
 
-                UpdateCategories(game);
+                if (option.SourceId != null)
+                    game.SourceId = option.SourceId.Value;
+
+                UpdateCategories(game, option);
                 UpdatePlayAction(game, executable);
+
+                DebugSource(game);
 
                 api.Database.Games.Update(game);
 
@@ -80,7 +91,8 @@ namespace ZipGameImporter
             string gameName,
             string version,
             string installDirectory,
-            string executable)
+            string executable,
+            ImportOption option)
         {
             try
             {
@@ -95,9 +107,10 @@ namespace ZipGameImporter
                 game.IsInstalled = true;
                 game.InstallDirectory = installDirectory;
 
-                game.Hidden = settings.Hidden;
-                game.SourceId = settings.Source.Id;
-                game.Categories.AddRange(settings.Categories);
+                game.Hidden = option.Hidden;
+
+                if(option.SourceId != null)
+                    game.SourceId = option.SourceId.Value;
 
                 UpdatePlayAction(game, executable);
 
